@@ -1,10 +1,6 @@
 #include <stdio.h>
-#include <pwd.h>
-#include <zconf.h>
-#include <string.h>
 #include <time.h>
 #include "main.h"
-#define HOME getpwuid(getuid())->pw_dir
 char * now(){
     time_t now;
     time(&now);
