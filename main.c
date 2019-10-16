@@ -11,9 +11,6 @@ char * now(){
     return ctime(&now);
 }
 int main(int argc, char ** argv){
-    char * path = strcat(HOME,"/test");
-    FILE * f = fopen(path, "w");
-    fputs(now(),f);
-    fclose(f);
+    printf("%s",now());
     return 0;
 }

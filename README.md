@@ -16,3 +16,8 @@ make distcheck # Use Makefile to build and test a tarball to distribute
 make # Use Makefile to build the program
 make install # Use Makefile to install the program²
 ```
+
+# Test it (will change while curli gets more feature)
+```bash
+curli # Wed Oct 16 17:21:11 2019
+```
