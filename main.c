@@ -115,7 +115,7 @@ int checkConfigurationExists() {
     if(file == NULL){
         debug("not able to open configuration file");
         return 1;
-    } /* file does not exist  */
+    } /* file does not exist */
     return 0; /* file does exist */
 }
 void openEditorForConfigurationFile(){
