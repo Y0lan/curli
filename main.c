@@ -111,20 +111,24 @@ int checkConfigurationExists() {
         debug("Not able to open configuration directory");
         return -1;
     }
-    FILE * file = fopen(CONFIGURATION_FILE,"a");
+    FILE * file = fopen(CONFIGURATION_FILE,"r");
     if(file == NULL){
         debug("not able to open configuration file");
         return 1;
     } /* file does not exist */
     return 0; /* file does exist */
 }
+void openEditorForConfigurationFile(){
+    system("clear");
+    if(getenv("EDITOR") == NULL) system("nano ~/.config/curli/conf.sconf");
+    else system("$EDITOR ~/.config/curli/conf.sconf");
+}
 void writeConfigurationFirstTime(){
     char choice;
     printf("\nDo you want to write your first config file? (Y/n)");
     choice = (char) fgetc(stdin);
     if(choice == 'Y' || choice == 'y'){
-        system("clear");
-        system("$EDITOR ~/.config/curli/conf.sconf");
+        openEditorForConfigurationFile();
     }
     else {
         return;
@@ -145,20 +149,21 @@ int createConfigurationFile(){
 
     /* put file configuration in directory */
     FILE * file = fopen(CONFIGURATION_FILE, "w"); /* write : create the file if it does not exist */
+    printf("\nconfig created...");
     if(file == NULL) { /* there have been an error while opening the file */
         debug("A problem happened while opening the configuration file");
         return 1;
     }
     fclose(file);
     showMan();
-//    writeConfigurationFirstTime();
+    writeConfigurationFirstTime();
     return 0; /* no errors happened */
 }
 FILE * openConfigurationFile(){
     return fopen(CONFIGURATION_FILE,"w");
 }
 int main(int argc, char ** argv){
-    if(argc) {
+    if(argc > 1) {
         if(strcmp(argv[1],"--help") == 0){
             showMan();
             return 0;
