@@ -111,7 +111,7 @@ int checkConfigurationExists() {
         debug("Not able to open configuration directory");
         return -1;
     }
-    FILE * file = fopen(CONFIGURATION_FILE,"r");
+    FILE * file = fopen(CONFIGURATION_FILE,"r"); /* open the file in r mode so that it only check if it exists without making it*/
     if(file == NULL){
         debug("not able to open configuration file");
         return 1;
