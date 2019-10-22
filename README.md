@@ -19,5 +19,9 @@ make install # Use Makefile to install the program²
 
 # Test it (will change while curli gets more feature)
 ```bash
-curli # Wed Oct 16 17:21:11 2019
+curli
+# a configuration file will be created to $HOME/.config/curli/conf.sconf
+# the help will be displayed
+# next : put a template inside the configuration file
+# next : read the configuration file and save each task into struct
 ```
