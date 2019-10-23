@@ -1,0 +1,4 @@
+#ifndef CURLI_PARSER_H
+#define CURLI_PARSER_H
+
+#endif //CURLI_PARSER_H
