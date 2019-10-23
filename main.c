@@ -198,7 +198,7 @@ int createConfigurationFile(){
     return 0; /* no errors happened */
 }
 FILE * openConfigurationFile(){
-    return fopen(CONFIGURATION_FILE,"w");
+    return fopen(CONFIGURATION_FILE,"r+");
 }
 int main(int argc, char ** argv){
     if(argc > 1) {
