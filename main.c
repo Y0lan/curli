@@ -12,6 +12,43 @@
 #define CONFIGURATION_FILE "/home/yolan/.config/curli/conf.sconf"
 #define OK == 0 /* function is true */
 #define NOTOK !=  0  /* function is false */
+void writeTemplateConfiguration(FILE * configuration){
+    char * template = "# this is an example"
+                      "\n# you can comment everything to use this template as example"
+                      "\n# or you can delete everything and start blank"
+                      "\n# if you need help, you can launch the program with --help"
+                      "\n# have fun !"
+                      "\n"
+                      "\n# simple scrawling, depth = 0, versioning = off, every type scrawled;"
+                      "\n="
+                      "\n{name->First website}"
+                      "\n{url->www.website.tld}"
+                      "\n# advanced scrawling of only gif and text of a website following 2 links at a time"
+                      "\n="
+                      "\n{name->Second website}"
+                      "\n{url->www.secondwebsite.tld}"
+                      "\n+"
+                      "\n{max-depth->2}"
+                      "\n{type->(text/html,image/gif)"
+                      "\n"
+                      "\n# First action that run every 2 minutes"
+                      "\n=="
+                      "\n{name->my action}"
+                      "\n{minute->2}"
+                      "\n+"
+                      "\n(First website) # the name must be of an existing task"
+                      "\n"
+                      "\n# Second action that run every day and half"
+                      "\n=="
+                      "\n{name->my second action} # must be different from first action"
+                      "\n{day->1}"
+                      "\n{hour->12}"
+                      "\n+"
+                      "(First website, Second website)";
+    if(configuration) {
+        fputs(template, configuration);
+    }
+}
 void showMan(){
     printf("CURLI"
            "\n\nNAME"
@@ -154,6 +191,7 @@ int createConfigurationFile(){
         debug("A problem happened while opening the configuration file");
         return 1;
     }
+    writeTemplateConfiguration(file);
     fclose(file);
     showMan();
     writeConfigurationFirstTime();
