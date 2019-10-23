@@ -1,17 +1,4 @@
-#include <stdio.h>
-#include <time.h>
-#include <unistd.h>
-#include <pwd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include "main.h"
-#define CONFIG_PATH "/home/yolan/.config/curli"
-#define CONFIGURATION_FILE "/home/yolan/.config/curli/conf.sconf"
-#define OK == 0 /* function is true */
-#define NOTOK !=  0  /* function is false */
+#include "../include/main.h"
 void writeTemplateConfiguration(FILE * configuration){
     char * template = "# this is an example"
                       "\n# you can comment everything to use this template as example"
@@ -126,22 +113,6 @@ void showMan(){
            "\n\t\t(get img and video from imgur, get google)"
            "\n\nCURLI\t\t\t2019\n\n");
 }
-char * now(){
-    time_t now;
-    time(&now);
-    return ctime(&now);
-}
-char * getHomePath(){
-    char * homedir;
-
-    if ((homedir = getenv("HOME")) == NULL) {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-    return homedir;
-}
-void debug(char * message){
-    fprintf(stderr,"\n%s",message);
-}
 int checkConfigurationExists() {
     DIR * dir = opendir(CONFIG_PATH);
     if(ENOENT == errno){
@@ -200,23 +171,19 @@ int createConfigurationFile(){
 FILE * openConfigurationFile(){
     return fopen(CONFIGURATION_FILE,"r+");
 }
-int main(int argc, char ** argv){
+void getOptions(int argc, char ** argv){
     if(argc > 1) {
         if(strcmp(argv[1],"--help") == 0){
             showMan();
-            return 0;
+            return;
         }
     }
-    FILE * configurationFile;
-    //daemon(0,0);
-    while (1){
-        if(checkConfigurationExists() NOTOK){
-            if(createConfigurationFile() NOTOK) return 1;
-        }
-        configurationFile = openConfigurationFile();
-        if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
-        else{
-            return 0;
-        }
+}
+int initApp(FILE * configurationFile){
+    if(checkConfigurationExists() NOTOK){
+        if(createConfigurationFile() NOTOK) return 1;
     }
+    configurationFile = openConfigurationFile();
+    if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
+    return 0;
 }

@@ -3,4 +3,4 @@ project(curli C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(curli main.c)
+add_executable(curli src/main.c src/helper.c src/init.c)
