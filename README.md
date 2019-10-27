@@ -22,6 +22,7 @@ make install # Use Makefile to install the program²
 curli
 # a configuration file will be created to $HOME/.config/curli/conf.sconf
 # the help will be displayed
-# next : put a template inside the configuration file
+# a template will be put inside the configuration file
+# you will be able to edit directly this file if you wish
 # next : read the configuration file and save each task into struct
 ```

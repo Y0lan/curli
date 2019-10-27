@@ -1,4 +1,5 @@
-#include "../include/parser.h"
+#include "include/main.h"
+#include "include/parser.h"
 typedef struct action{
     char * name;
     char * url;
@@ -12,3 +13,7 @@ typedef struct task {
     unsigned long long * second; /* Let's say that we will count the time before each action in second */
                                  /* second[0] -> timer for actions[0], second[1] (> timer for actions[1], etc... */
 } task;
+
+void getActions(FILE * configuration){
+
+}

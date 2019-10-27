@@ -1,4 +1,4 @@
-#include "../include/main.h"
+#include "include/main.h"
 void writeTemplateConfiguration(FILE * configuration){
     char * template = "# this is an example"
                       "\n# you can comment everything to use this template as example"
