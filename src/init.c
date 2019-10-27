@@ -1,42 +1,44 @@
 #include "include/main.h"
-void writeTemplateConfiguration(FILE * configuration){
+void writeTemplateConfiguration(FILE * configuration)
+{
     char * template = "# this is an example"
-                      "\n# you can comment everything to use this template as example"
-                      "\n# or you can delete everything and start blank"
-                      "\n# if you need help, you can launch the program with --help"
-                      "\n# have fun !"
-                      "\n"
-                      "\n# simple scrawling, depth = 0, versioning = off, every type scrawled;"
-                      "\n="
-                      "\n{name->First website}"
-                      "\n{url->www.website.tld}"
-                      "\n# advanced scrawling of only gif and text of a website following 2 links at a time"
-                      "\n="
-                      "\n{name->Second website}"
-                      "\n{url->www.secondwebsite.tld}"
-                      "\n+"
-                      "\n{max-depth->2}"
-                      "\n{type->(text/html,image/gif)"
-                      "\n"
-                      "\n# First action that run every 2 minutes"
-                      "\n=="
-                      "\n{name->my action}"
-                      "\n{minute->2}"
-                      "\n+"
-                      "\n(First website) # the name must be of an existing task"
-                      "\n"
-                      "\n# Second action that run every day and half"
-                      "\n=="
-                      "\n{name->my second action} # must be different from first action"
-                      "\n{day->1}"
-                      "\n{hour->12}"
-                      "\n+"
-                      "(First website, Second website)";
+    "\n# you can comment everything to use this template as example"
+    "\n# or you can delete everything and start blank"
+    "\n# if you need help, you can launch the program with --help"
+    "\n# have fun !"
+    "\n"
+    "\n# simple scrawling, depth = 0, versioning = off, every type scrawled;"
+    "\n="
+    "\n{name->First website}"
+    "\n{url->www.website.tld}"
+    "\n# advanced scrawling of only gif and text of a website following 2 links at a time"
+    "\n="
+    "\n{name->Second website}"
+    "\n{url->www.secondwebsite.tld}"
+    "\n+"
+    "\n{max-depth->2}"
+    "\n{type->(text/html,image/gif)"
+    "\n"
+    "\n# First action that run every 2 minutes"
+    "\n=="
+    "\n{name->my action}"
+    "\n{minute->2}"
+    "\n+"
+    "\n(First website) # the name must be of an existing task"
+    "\n"
+    "\n# Second action that run every day and half"
+    "\n=="
+    "\n{name->my second action} # must be different from first action"
+    "\n{day->1}"
+    "\n{hour->12}"
+    "\n+"
+    "(First website, Second website)";
     if(configuration) {
         fputs(template, configuration);
     }
 }
-void showMan(){
+void showMan()
+{
     printf("CURLI"
            "\n\nNAME"
            "\n\tcurli - Curl, improved"
@@ -118,47 +120,47 @@ void showMan(){
            "\n\t\t(get img and video from imgur, get google)"
            "\n\nCURLI\t\t\t2019\n\n");
 }
-int checkConfigurationExists() {
-    DIR * dir = opendir(CONFIG_PATH);
-    if(ENOENT == errno){
+int checkConfigurationExists()
+{
+    if(ENOENT == errno) {
         debug("Not able to open configuration directory");
         return -1;
     }
     FILE * file = fopen(CONFIGURATION_FILE,"r"); /* open the file in r mode so that it only check if it exists without making it*/
-    if(file == NULL){
+    if(file == NULL) {
         debug("not able to open configuration file");
         return 1;
     } /* file does not exist */
     return 0; /* file does exist */
 }
-void openEditorForConfigurationFile(){
+void openEditorForConfigurationFile()
+{
     system("clear");
     if(getenv("EDITOR") == NULL) system("nano ~/.config/curli/conf.sconf");
     else system("$EDITOR ~/.config/curli/conf.sconf");
 }
-void writeConfigurationFirstTime(){
+void writeConfigurationFirstTime()
+{
     char choice;
     printf("\nDo you want to write your first config file? (Y/n)");
     choice = (char) fgetc(stdin);
-    if(choice == 'Y' || choice == 'y'){
+    if(choice == 'Y' || choice == 'y') {
         openEditorForConfigurationFile();
-    }
-    else {
+    } else {
         return;
     }
 }
-int createConfigurationFile(){
+int createConfigurationFile()
+{
     /* check if directory for file configuration */
     DIR * dir = opendir(CONFIG_PATH);
-    if(dir){/* directory for the config file exist */
+    if(dir) { /* directory for the config file exist */
         debug("directory for the config file exists");
         closedir(dir);
-    }
-    else if(ENOENT == errno) {
+    } else if(ENOENT == errno) {
         debug("config path does not exist, making it");
         mkdir(CONFIG_PATH,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH); /* read/write/search permissions for owner and group, and with read/search permissions for others */
-    }
-    else return -1; /* mkdir failed for other reason */
+    } else return -1; /* mkdir failed for other reason */
 
     /* put file configuration in directory */
     FILE * file = fopen(CONFIGURATION_FILE, "w"); /* write : create the file if it does not exist */
@@ -173,22 +175,24 @@ int createConfigurationFile(){
     writeConfigurationFirstTime();
     return 0; /* no errors happened */
 }
-FILE * openConfigurationFile(){
+FILE * openConfigurationFile()
+{
     return fopen(CONFIGURATION_FILE,"r+");
 }
-void getOptions(int argc, char ** argv){
+void getOptions(int argc, char ** argv)
+{
     if(argc > 1) {
-        if(strcmp(argv[1],"--help") == 0){
+        if(strcmp(argv[1],"--help") == 0) {
             showMan();
             return;
         }
     }
 }
-int initApp(FILE * configurationFile){
-    if(checkConfigurationExists() NOTOK){ /* the path or the file does not exist */
+int initApp()
+{
+    if(checkConfigurationExists() NOTOK) { /* the path or the file does not exist */
+        printf("Path does not exist...");
         if(createConfigurationFile() NOTOK) return 1; /* could not make the path nor the file */
     }
-    configurationFile = openConfigurationFile(); /* open with r+ */
-    if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
     return 0;
 }

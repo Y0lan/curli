@@ -1,10 +1,12 @@
-#include "../include/main.h"
-char * now(){
+#include "include/main.h"
+char * now()
+{
     time_t now;
     time(&now);
     return ctime(&now);
 }
-char * getHomePath(){
+char * getHomePath()
+{
     char * homedir;
 
     if ((homedir = getenv("HOME")) == NULL) {
@@ -12,6 +14,7 @@ char * getHomePath(){
     }
     return homedir;
 }
-void debug(char * message){
+void debug(char * message)
+{
     fprintf(stderr,"\n%s",message);
 }

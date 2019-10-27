@@ -9,5 +9,5 @@ void writeConfigurationFirstTime();
 int createConfigurationFile();
 FILE * openConfigurationFile();
 void getOptions(int argc, char ** argv);
-int initApp(FILE * configurationFile);
+int initApp();
 #endif //CURLI_INIT_H
