@@ -1,18 +1,4 @@
 #include "include/main.h"
-typedef struct action {
-    char * name;
-    char * url;
-    unsigned int max_depth;
-    unsigned short versioning;
-    char ** type;
-} action;
-
-typedef struct task {
-    action * actions;
-    unsigned long long * second; /* Let's say that we will count the time before each action in second */
-    /* second[0] -> timer for actions[0], second[1] (> timer for actions[1], etc... */
-} task;
-
 int * getLongestLineAndNumberLines()
 {
     FILE * file = fopen(CONFIGURATION_FILE,"r");
@@ -86,6 +72,18 @@ void removeAllComments(char ** str)
     for( int c = 0; c < j; c++) {
         printf("%s",strWithoutComments[c]);
     }
+}
+
+int countNbTask(char ** conf){
+    int * lines = getLongestLineAndNumberLines();
+    int nbLines = lines[1];
+    int i = 0, counter = 0;
+    for( ; i < nbLines; i++ ){
+        if(strncmp(conf[i], "=",1) > 0) {
+            counter++;
+        }
+    }
+    return counter;
 }
 
 void freeStrConf(char ** str)

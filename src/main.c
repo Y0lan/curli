@@ -8,8 +8,13 @@ int main(int argc, char ** argv)
     while (1) {
         configurationFile = openConfigurationFile(); /* open with r+ */
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
-        char ** strConf = confToStr(configurationFile);
-        removeAllComments(strConf);
+        char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
+        removeAllComments(strConf); /* remove the comments from strConf */
+
+        int nbOfTasks = countNbTask(strConf);
+        task * tasks = malloc(sizeof(tasks))
+
+
 
         freeStrConf(strConf);
 
