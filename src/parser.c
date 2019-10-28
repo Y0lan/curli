@@ -1,5 +1,4 @@
 #include "include/main.h"
-#include "include/parser.h"
 typedef struct action {
     char * name;
     char * url;
@@ -60,23 +59,32 @@ char ** confToStr(FILE * file)
     }
     return strOfConf;
 }
-void removeComment(char ** str)
+
+char * removeComment(char * line)
+{
+    if(line == NULL) return NULL; /* fils de pute */
+    if(strlen(line) == 0) return NULL; /* there is no line */
+    char * lineCorrected = calloc(strlen(line), sizeof(char) * strlen(line));
+    u_long i = 0;
+    for( ; i < strlen(line); i++) {
+        if(line[i] == '#') return lineCorrected;
+        else lineCorrected[i] = line[i];
+    }
+    return lineCorrected;
+}
+
+void removeAllComments(char ** str)
 {
     int i = 0, j = 0;
     int * lines = getLongestLineAndNumberLines();
     char ** strWithoutComments = calloc(lines[1],sizeof(char **) * lines[1]);
     int nbLines = lines[1];
-    int c;
     for( ;  i < nbLines; i++) {
         strWithoutComments[j] = calloc(lines[0], sizeof(char) * lines[0]);
-        char buffer[lines[0]];
-        strcpy(buffer, str[i]);
-        if((int) str[0] == '#') {
-            continue;
-        } else {
-            strcpy(strWithoutComments[j], buffer);
-            j += 1;
-        }
+        if(removeComment(str[i]) != NULL) strcpy(strWithoutComments[j++],removeComment(str[i]));
+    }
+    for( int c = 0; c < j; c++) {
+        printf("%s",strWithoutComments[c]);
     }
 }
 

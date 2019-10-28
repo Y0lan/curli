@@ -3,5 +3,5 @@
 void getActions(FILE *);
 char ** confToStr(FILE *);
 void freeStrConf(char **);
-void removeComment(char **);
+void removeAllComments(char **);
 #endif //CURLI_PARSER_H
