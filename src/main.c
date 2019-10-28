@@ -9,6 +9,8 @@ int main(int argc, char ** argv)
         configurationFile = openConfigurationFile(); /* open with r+ */
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
         char ** strConf = confToStr(configurationFile);
+        removeComment(strConf);
+
         freeStrConf(strConf);
 
 

@@ -37,20 +37,48 @@ int * getLongestLineAndNumberLines()
     fclose(file);
     return result;
 }
-char ** confToStr()
+char ** confToStr(FILE * file)
 {
     int * lines = getLongestLineAndNumberLines(); /* lines[0] longest line : lines[1] number of lines */
     char ** strOfConf = malloc(sizeof(char **) * lines[1]);
+    int longestLine = lines[0], nbLines = lines[1];
     if(strOfConf == NULL) return (char **) EXIT_FAILURE;
     int i = 0;
-    for(; i<lines[1] ; i++) {
-        strOfConf[i] = malloc(sizeof(char) * lines[0]);
+    for(; i<nbLines ; i++) {
+        strOfConf[i] = calloc(longestLine,sizeof(char) * longestLine);
         if(strOfConf[i] == NULL) return (char **) EXIT_FAILURE;
     }
 
+    char * l = malloc(longestLine);
+    fgets(l,longestLine,file);
+    strcpy(strOfConf[0],l);
+    strcat(*strOfConf,"\0");
+    for( i = 1; i < nbLines; i++) {
+        fgets(l,longestLine,file);
+        strcat(strOfConf[i], l);
+        strcat(strOfConf[i], "\0");
+    }
     return strOfConf;
 }
-
+void removeComment(char ** str)
+{
+    int i = 0, j = 0;
+    int * lines = getLongestLineAndNumberLines();
+    char ** strWithoutComments = calloc(lines[1],sizeof(char **) * lines[1]);
+    int nbLines = lines[1];
+    int c;
+    for( ;  i < nbLines; i++) {
+        strWithoutComments[j] = calloc(lines[0], sizeof(char) * lines[0]);
+        char buffer[lines[0]];
+        strcpy(buffer, str[i]);
+        if((int) str[0] == '#') {
+            continue;
+        } else {
+            strcpy(strWithoutComments[j], buffer);
+            j += 1;
+        }
+    }
+}
 
 void freeStrConf(char ** str)
 {
