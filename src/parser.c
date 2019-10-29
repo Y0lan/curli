@@ -69,17 +69,15 @@ void removeAllComments(char ** str)
         strWithoutComments[j] = calloc(lines[0], sizeof(char) * lines[0]);
         if(removeComment(str[i]) != NULL) strcpy(strWithoutComments[j++],removeComment(str[i]));
     }
-    for( int c = 0; c < j; c++) {
-        printf("%s",strWithoutComments[c]);
-    }
 }
 
-int countNbTask(char ** conf){
+int countNbTask(char ** conf)
+{
     int * lines = getLongestLineAndNumberLines();
     int nbLines = lines[1];
     int i = 0, counter = 0;
-    for( ; i < nbLines; i++ ){
-        if(strncmp(conf[i], "=",1) > 0) {
+    for( ; i < nbLines; i++ ) {
+        if(strcmp(conf[i], "=") > 0) {
             counter++;
         }
     }

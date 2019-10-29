@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
         removeAllComments(strConf); /* remove the comments from strConf */
 
         int nbOfTasks = countNbTask(strConf);
-        task * tasks = malloc(sizeof(tasks))
+        printf("%d", nbOfTasks);
 
 
 

@@ -15,8 +15,7 @@ typedef struct action {
 
 typedef struct task {
     action * actions;
-    unsigned long long * second; /* Let's say that we will count the time before each action in second */
-    /* second[0] -> timer for actions[0], second[1] (> timer for actions[1], etc... */
+    unsigned long  second; /* Let's say that we will count the time before each action in second */
 } task;
 
 #endif //CURLI_PARSER_H
