@@ -4,4 +4,6 @@
 char * now();
 char * getHomePath();
 void debug(char * message);
+char * getConfigPath(char * );
+char * getConfigFilePath(char * );
 #endif //CURLI_HELPER_H

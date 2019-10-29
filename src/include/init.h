@@ -3,11 +3,12 @@
 
 void writeTemplateConfiguration(FILE * configuration);
 void showMan();
-int checkConfigurationExists();
+int checkConfigurationExists(char *, char *);
 void openEditorForConfigurationFile();
 void writeConfigurationFirstTime();
-int createConfigurationFile();
-FILE * openConfigurationFile();
+int createConfigurationFile(char *, char *);
+FILE * openConfigurationFile(char *);
 void getOptions(int argc, char ** argv);
-int initApp();
+int initApp(char *, char *);
+
 #endif //CURLI_INIT_H

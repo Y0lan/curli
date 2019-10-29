@@ -5,6 +5,20 @@ char * now()
     time(&now);
     return ctime(&now);
 }
+char * getConfigPath(char * str)
+{
+    strcpy(str,getHomePath());
+    strcat(str,CONFIG_PATH);
+    return str;
+}
+
+char * getConfigFilePath(char * str)
+{
+    strcpy(str,getHomePath());
+    strcat(str,CONFIGURATION_FILE);
+    return str;
+}
+
 char * getHomePath()
 {
     char * homedir;

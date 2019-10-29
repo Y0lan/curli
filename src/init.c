@@ -1,4 +1,5 @@
 #include "include/main.h"
+
 void writeTemplateConfiguration(FILE * configuration)
 {
     char * template = "# this is an example"
@@ -120,13 +121,14 @@ void showMan()
            "\n\t\t(get img and video from imgur, get google)"
            "\n\nCURLI\t\t\t2019\n\n");
 }
-int checkConfigurationExists()
+int checkConfigurationExists(char * configFile, char * configFilePath)
 {
+
     if(ENOENT == errno) {
         debug("Not able to open configuration directory");
         return -1;
     }
-    FILE * file = fopen(CONFIGURATION_FILE,"r"); /* open the file in r mode so that it only check if it exists without making it*/
+    FILE * file = fopen(configFilePath,"r"); /* open the file in r mode so that it only check if it exists without making it*/
     if(file == NULL) {
         debug("not able to open configuration file");
         return 1;
@@ -150,20 +152,20 @@ void writeConfigurationFirstTime()
         return;
     }
 }
-int createConfigurationFile()
+int createConfigurationFile(char * configPath, char * configFilePath)
 {
     /* check if directory for file configuration */
-    DIR * dir = opendir(CONFIG_PATH);
+    DIR * dir = opendir(configPath);
     if(dir) { /* directory for the config file exist */
         debug("directory for the config file exists");
         closedir(dir);
     } else if(ENOENT == errno) {
         debug("config path does not exist, making it");
-        mkdir(CONFIG_PATH,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH); /* read/write/search permissions for owner and group, and with read/search permissions for others */
+        mkdir(configPath,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH); /* read/write/search permissions for owner and group, and with read/search permissions for others */
     } else return -1; /* mkdir failed for other reason */
 
     /* put file configuration in directory */
-    FILE * file = fopen(CONFIGURATION_FILE, "w"); /* write : create the file if it does not exist */
+    FILE * file = fopen(configFilePath, "w"); /* write : create the file if it does not exist */
     printf("\nconfig created...");
     if(file == NULL) { /* there have been an error while opening the file */
         debug("A problem happened while opening the configuration file");
@@ -175,9 +177,9 @@ int createConfigurationFile()
     writeConfigurationFirstTime();
     return 0; /* no errors happened */
 }
-FILE * openConfigurationFile()
+FILE * openConfigurationFile(char * configurationFile)
 {
-    return fopen(CONFIGURATION_FILE,"r+");
+    return fopen(configurationFile,"r+");
 }
 void getOptions(int argc, char ** argv)
 {
@@ -188,11 +190,11 @@ void getOptions(int argc, char ** argv)
         }
     }
 }
-int initApp()
+int initApp(char * configPath, char * configFilePath)
 {
-    if(checkConfigurationExists() NOTOK) { /* the path or the file does not exist */
+    if(checkConfigurationExists(configPath, configFilePath) NOTOK) { /* the path or the file does not exist */
         printf("Path does not exist...");
-        if(createConfigurationFile() NOTOK) return 1; /* could not make the path nor the file */
+        if(createConfigurationFile(configPath, configFilePath) NOTOK) return 1; /* could not make the path nor the file */
     }
     return 0;
 }
