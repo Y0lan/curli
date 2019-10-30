@@ -1,7 +1,9 @@
 #include "include/main.h"
 int * getLongestLineAndNumberLines()
 {
-    FILE * file = fopen(CONFIGURATION_FILE,"r");
+    char * configFilePath = malloc(sizeof(char) * 180);
+    getConfigFilePath(configFilePath);
+    FILE * file = fopen(configFilePath,"r");
     int c;
     int nbChar = 0;
     int nbLine = 1;
@@ -20,6 +22,7 @@ int * getLongestLineAndNumberLines()
     result[0] = longestLine;
     result[1] = nbLine;
     fclose(file);
+    free(configFilePath);
     return result;
 }
 char ** confToStr(FILE * file)
@@ -77,13 +80,22 @@ int countNbTask(char ** conf)
     int nbLines = lines[1];
     int i = 0, counter = 0;
     for( ; i < nbLines; i++ ) {
-        if(strcmp(conf[i], "=") > 0) {
+        if(strncmp(conf[i], "==", 2) == 0 && strlen(conf[i]) == 3) { /* si il y'a == dedans et que le string est "=\n" */
             counter++;
         }
     }
     return counter;
 }
-
+int countNbAction(char ** conf){
+    int * lines = getLongestLineAndNumberLines();
+    int nbLines = lines[1];
+    int i = 0, counter = 0;
+    for ( ; i < nbLines; i++){
+        if(strncmp(conf[i], "=", 1) == 0 && strlen(conf[i]) == 2) {
+            counter++;
+        }
+    }
+}
 void freeStrConf(char ** str)
 {
     int * lines = getLongestLineAndNumberLines();

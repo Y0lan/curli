@@ -11,12 +11,16 @@ int main(int argc, char ** argv)
     //daemon(0,0);
     while (1) {
         configurationFile = openConfigurationFile(configFilePath); /* open with r+ */
+
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
         char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
         removeAllComments(strConf); /* remove the comments from strConf */
 
+
         int nbOfTasks = countNbTask(strConf);
-        printf("%d", nbOfTasks);
+        int nbOfActions = countNbAction(strConf);
+        task * Task = malloc(sizeof(task) * nbOfTasks);
+        action * Action = malloc(sizeof(action) * nbOfActions);
 
 
 
@@ -28,4 +32,5 @@ int main(int argc, char ** argv)
         fclose(configurationFile);
         return 0;
     }
+
 }

@@ -4,6 +4,7 @@ char ** confToStr(FILE *);
 void freeStrConf(char **);
 void removeAllComments(char **);
 int countNbTask(char ** conf);
+int countNbAction(char ** conf);
 
 typedef struct action {
     char * name;
