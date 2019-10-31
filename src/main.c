@@ -13,18 +13,21 @@ int main(int argc, char ** argv)
         configurationFile = openConfigurationFile(configFilePath); /* open with r+ */
 
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
-        char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
-        removeAllComments(strConf); /* remove the comments from strConf */
+        checkFileForSyntaxError(configurationFile);
+//        readConfigurationFile(configurationFile);
+        //char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
+        //removeAllComments(strConf); /* remove the comments from strConf */
 
 
-        int nbOfTasks = countNbTask(strConf);
-        int nbOfActions = countNbAction(strConf);
-        task * Task = malloc(sizeof(task) * nbOfTasks);
-        action * Action = malloc(sizeof(action) * nbOfActions);
+        //int nbOfTasks = countNbTask(strConf);
+        //int nbOfActions = countNbAction(strConf);
+        //task * task = malloc(sizeof(task) * nbOfTasks);
+        //action * action = malloc(sizeof(action) * nbOfActions);
 
 
 
-        freeStrConf(strConf);
+
+        //freeStrConf(strConf);
 
 
 

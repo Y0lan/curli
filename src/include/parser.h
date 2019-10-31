@@ -5,7 +5,8 @@ void freeStrConf(char **);
 void removeAllComments(char **);
 int countNbTask(char ** conf);
 int countNbAction(char ** conf);
-
+void readConfigurationFile(FILE *);
+void checkFileForSyntaxError(FILE * f);
 typedef struct action {
     char * name;
     char * url;

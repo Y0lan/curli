@@ -48,11 +48,11 @@ char ** confToStr(FILE * file)
     }
     return strOfConf;
 }
-
+/*
 char * removeComment(char * line)
 {
-    if(line == NULL) return NULL; /* fils de pute */
-    if(strlen(line) == 0) return NULL; /* there is no line */
+    if(line == NULL) return NULL;
+    if(strlen(line) == 0) return NULL;
     char * lineCorrected = calloc(strlen(line), sizeof(char) * strlen(line));
     u_long i = 0;
     for( ; i < strlen(line); i++) {
@@ -61,7 +61,8 @@ char * removeComment(char * line)
     }
     return lineCorrected;
 }
-
+*/
+/*
 void removeAllComments(char ** str)
 {
     int i = 0, j = 0;
@@ -73,7 +74,7 @@ void removeAllComments(char ** str)
         if(removeComment(str[i]) != NULL) strcpy(strWithoutComments[j++],removeComment(str[i]));
     }
 }
-
+*/
 int countNbTask(char ** conf)
 {
     int * lines = getLongestLineAndNumberLines();
@@ -86,16 +87,83 @@ int countNbTask(char ** conf)
     }
     return counter;
 }
-int countNbAction(char ** conf){
+int countNbAction(char ** conf)
+{
     int * lines = getLongestLineAndNumberLines();
     int nbLines = lines[1];
     int i = 0, counter = 0;
-    for ( ; i < nbLines; i++){
+    for ( ; i < nbLines; i++) {
         if(strncmp(conf[i], "=", 1) == 0 && strlen(conf[i]) == 2) {
             counter++;
         }
     }
+    return counter;
 }
+void removeComment(char * line)
+{
+    char * commentPos;
+    commentPos = strchr(line,'#');
+    int endOfLineComment = 0;
+    if(commentPos) {
+        long position =  commentPos - line;
+        if(position > 0) endOfLineComment = 1;
+        memcpy(line,line, position);
+        if(endOfLineComment) line[position++] = '\n';
+        line[position] = '\0';
+    }
+}
+void checkKeyAction(char * line, int n)
+{
+    if(*line != '{' && *line != '+') {
+        fprintf(stderr,"\nERROR : %c NOT EXPECTED at 1:%d", *line, n);
+    }
+}
+void checkKeyTask(char * line, int n)
+{
+
+}
+void checkFileForSyntaxError(FILE * config)
+{
+    char line[300];
+    char firstChar[5] = "=({+";
+    int countLine = 1;
+    int inTask = 0;
+    int inAction = 0;
+    while(fgets(line, 300, config)) {
+        line[(strchr(line,'\n') - line) + 1] = '\0';
+        removeComment(line);
+        if(!strchr(firstChar, line[0]) && line[0] != '\n') {
+            fprintf(stderr,"\n%c syntax error at %d:1",*line,countLine);
+            return;
+        }
+        if(strlen(line) == 3 && line[0] == '=' && line[1] == '=') {
+            inAction = 0;
+            inTask = 1;
+            continue;
+        }
+        if(strlen(line) == 2 && line[0] == '=') {
+            inTask = 0;
+            inAction = 1;
+            continue;
+        }
+        if(inTask) checkKeyTask(line, countLine);
+        if(inAction) checkKeyAction(line, countLine);
+        countLine = countLine + 1;
+    }
+}
+
+void readConfigurationFile(FILE * config)
+{
+    char line[300];
+    while(fgets(line,300,config)) {
+        removeComment(line);
+
+
+        //printf("%s", line);
+    }
+}
+
+
 void freeStrConf(char ** str)
 {
     int * lines = getLongestLineAndNumberLines();
