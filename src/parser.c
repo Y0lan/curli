@@ -114,15 +114,23 @@ void removeComment(char * line)
 }
 void checkKeyAction(char * line, int n)
 {
-    if(*line != '{' && *line != '+') {
-        fprintf(stderr,"\nERROR : %c NOT EXPECTED at 1:%d", *line, n);
+    if(*line == '=' || *line == ' ' || *line == '\n') return;
+    int len = strlen(line), i = 0;
+    char c = NULL;
+    printf("ACTION: \n%s", line);
+    for ( ; i < len ; i++ ) {
+
     }
 }
 void checkKeyTask(char * line, int n)
 {
+    if(*line == '\n') return;
+    int len = strlen(line), i = 0;
+
+    printf("TASK: \n%s", line);
 
 }
-void checkFileForSyntaxError(FILE * config)
+void checkFileForSyntaxError(FILE * config, task * tasks, action * actions)
 {
     char line[300];
     char firstChar[5] = "=({+";
@@ -131,37 +139,34 @@ void checkFileForSyntaxError(FILE * config)
     int inAction = 0;
     while(fgets(line, 300, config)) {
         line[(strchr(line,'\n') - line) + 1] = '\0';
-        removeComment(line);
+        removeComment(line); /* work correctly */
         if(!strchr(firstChar, line[0]) && line[0] != '\n') {
             fprintf(stderr,"\n%c syntax error at %d:1",*line,countLine);
             return;
         }
-        if(strlen(line) == 3 && line[0] == '=' && line[1] == '=') {
+        //printf("\n-----\n\n%d : strlen : %d 1: %c 2: %c str: %s \n ------", countLine,(int) strlen(line), line[0], line[1], line);
+
+        int nbTasks = 0, nbActions = 0;
+
+        if(line[0] == '=' && line[1] == '=') {
             inAction = 0;
             inTask = 1;
+            nbTasks = nbTasks + 1;
             continue;
         }
-        if(strlen(line) == 2 && line[0] == '=') {
+        if(line[0] == '=' && line[1] != '=') {
             inTask = 0;
             inAction = 1;
+            nbActions = nbActions + 1;
             continue;
         }
         if(inTask) checkKeyTask(line, countLine);
         if(inAction) checkKeyAction(line, countLine);
         countLine = countLine + 1;
     }
+
 }
 
-void readConfigurationFile(FILE * config)
-{
-    char line[300];
-    while(fgets(line,300,config)) {
-        removeComment(line);
-
-
-        //printf("%s", line);
-    }
-}
 
 
 void freeStrConf(char ** str)

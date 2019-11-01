@@ -10,6 +10,7 @@
 #include "helper.h"
 #include "init.h"
 #include "parser.h"
+#include "struct.h"
 #define CONFIG_PATH "/.config/curli"
 #define CONFIGURATION_FILE "/.config/curli/conf.sconf"
 #define OK == 0 /* function is true */

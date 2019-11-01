@@ -13,7 +13,9 @@ int main(int argc, char ** argv)
         configurationFile = openConfigurationFile(configFilePath); /* open with r+ */
 
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
-        checkFileForSyntaxError(configurationFile);
+        task * tasks = NULL;
+        action * actions = NULL;
+        readConfigurationFile(configurationFile, tasks, actions);
 //        readConfigurationFile(configurationFile);
         //char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
         //removeAllComments(strConf); /* remove the comments from strConf */
