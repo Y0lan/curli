@@ -15,7 +15,7 @@ int main(int argc, char ** argv)
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
         task * tasks = NULL;
         action * actions = NULL;
-        readConfigurationFile(configurationFile, tasks, actions);
+        checkFileForSyntaxError(configurationFile, tasks, actions);
 //        readConfigurationFile(configurationFile);
         //char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
         //removeAllComments(strConf); /* remove the comments from strConf */

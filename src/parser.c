@@ -112,59 +112,63 @@ void removeComment(char * line)
         line[position] = '\0';
     }
 }
-void checkKeyAction(char * line, int n)
+void checkKeyAction(char * line, int actionN, int lineN, int new)
 {
     if(*line == '=' || *line == ' ' || *line == '\n') return;
     int len = strlen(line), i = 0;
     char c = NULL;
-    printf("ACTION: \n%s", line);
+    int main = 0, option = 0;
+    printf("\nACTION %d: \n%s", actionN, line);
     for ( ; i < len ; i++ ) {
 
     }
 }
-void checkKeyTask(char * line, int n)
+void checkKeyTask(char * line, int actionN, int lineN, int new)
 {
     if(*line == '\n') return;
     int len = strlen(line), i = 0;
-
-    printf("TASK: \n%s", line);
-
+    printf("\nTASK %d: \n%s",actionN, line);
+}
+void checkMode(char * line, int * inAction, int * inTask, int * nbActions, int * nbTasks, int * next, int * new)
+{
+    if(line[0] == '=' && line[1] == '=') {
+        *inAction = 0;
+        *inTask = 1;
+        *nbTasks = *nbTasks + 1;
+        *next = 1;
+        *new = 1;
+    }
+    if(line[0] == '=' && line[1] != '=') {
+        *inTask = 0;
+        *inAction = 1;
+        *nbActions = *nbActions + 1;
+        *next = 1;
+        *new = 1;
+    }
 }
 void checkFileForSyntaxError(FILE * config, task * tasks, action * actions)
 {
     char line[300];
     char firstChar[5] = "=({+";
     int countLine = 1;
-    int inTask = 0;
-    int inAction = 0;
+    int inTask = 0, nbTasks = 0;
+    int inAction = 0, nbActions = 0;
     while(fgets(line, 300, config)) {
-        line[(strchr(line,'\n') - line) + 1] = '\0';
+        line[(strchr(line,'\n') - line)] = '\0';
         removeComment(line); /* work correctly */
-        if(!strchr(firstChar, line[0]) && line[0] != '\n') {
+        if(!strchr(firstChar, line[0])) {
             fprintf(stderr,"\n%c syntax error at %d:1",*line,countLine);
             return;
         }
         //printf("\n-----\n\n%d : strlen : %d 1: %c 2: %c str: %s \n ------", countLine,(int) strlen(line), line[0], line[1], line);
 
-        int nbTasks = 0, nbActions = 0;
+        int next = 0, new = 1; /* new est là pour savoir quand on passe sur une nouvelle action */
+        checkMode(line, &inAction, &inTask, &nbActions, &nbTasks, &next, &new);
 
-        if(line[0] == '=' && line[1] == '=') {
-            inAction = 0;
-            inTask = 1;
-            nbTasks = nbTasks + 1;
-            continue;
-        }
-        if(line[0] == '=' && line[1] != '=') {
-            inTask = 0;
-            inAction = 1;
-            nbActions = nbActions + 1;
-            continue;
-        }
-        if(inTask) checkKeyTask(line, countLine);
-        if(inAction) checkKeyAction(line, countLine);
+        if(inTask) checkKeyTask(line, nbTasks, countLine, new);
+        if(inAction) checkKeyAction(line, nbActions, countLine, new);
         countLine = countLine + 1;
     }
-
 }
 
 
