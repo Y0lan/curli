@@ -114,20 +114,27 @@ void removeComment(char * line)
 }
 void checkKeyAction(char * line, int actionN, int lineN, int new)
 {
-    if(*line == '=' || *line == ' ' || *line == '\n') return;
-    int len = strlen(line), i = 0;
-    char c = NULL;
-    int main = 0, option = 0;
-    printf("\nACTION %d: \n%s", actionN, line);
-    for ( ; i < len ; i++ ) {
+    if(*line != '{') return;
+    printf("\n\n\nACTIONS%d : \nline : %s", actionN, line);
+    const char delim[4] = "{->}";
+    char * token = strtok(line,delim);
+    do {
+        printf("\ntoken : %s", token);
+        token = strtok(NULL, delim);
+    } while(token != NULL);
 
-    }
 }
-void checkKeyTask(char * line, int actionN, int lineN, int new)
+void checkKeyTask(char * line, int taskN, int lineN, int new)
 {
-    if(*line == '\n') return;
-    int len = strlen(line), i = 0;
-    printf("\nTASK %d: \n%s",actionN, line);
+    if(*line != '{') return;
+    printf("\n\n\nTASKS%d : \nline : %s", taskN, line);
+    const char delim[4] = "{->}";
+    char * token = strtok(line,delim);
+    do {
+        printf("\ntoken : %s", token);
+        token = strtok(NULL, delim);
+    } while(token != NULL);
+
 }
 void checkMode(char * line, int * inAction, int * inTask, int * nbActions, int * nbTasks, int * next, int * new)
 {
@@ -160,13 +167,14 @@ void checkFileForSyntaxError(FILE * config, task * tasks, action * actions)
             fprintf(stderr,"\n%c syntax error at %d:1",*line,countLine);
             return;
         }
-        //printf("\n-----\n\n%d : strlen : %d 1: %c 2: %c str: %s \n ------", countLine,(int) strlen(line), line[0], line[1], line);
-
         int next = 0, new = 1; /* new est là pour savoir quand on passe sur une nouvelle action */
         checkMode(line, &inAction, &inTask, &nbActions, &nbTasks, &next, &new);
-
-        if(inTask) checkKeyTask(line, nbTasks, countLine, new);
-        if(inAction) checkKeyAction(line, nbActions, countLine, new);
+        if(inTask) {
+            checkKeyTask(line, nbTasks, countLine, new);
+        }
+        if(inAction) {
+            checkKeyAction(line, nbActions, countLine, new);
+        }
         countLine = countLine + 1;
     }
 }
