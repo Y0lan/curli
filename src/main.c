@@ -13,28 +13,25 @@ int main(int argc, char ** argv)
         configurationFile = openConfigurationFile(configFilePath); /* open with r+ */
 
         if(configurationFile == NULL) return 1; /* There have been a problem opening the file */
-        task * tasks = NULL;
-        action * actions = NULL;
-        checkFileForSyntaxError(configurationFile, tasks, actions);
-//        readConfigurationFile(configurationFile);
-        //char ** strConf = confToStr(configurationFile); /* get all lines from the config files */
-        //removeAllComments(strConf); /* remove the comments from strConf */
+        struct_tasks tasks;
+        struct_tasks * p_tasks = &tasks;
+        struct_actions actions;
+        struct_actions * p_actions = &actions;
+        p_actions = malloc(sizeof(struct_actions));
+        p_actions->action = malloc(sizeof(struct_action));
+        printf("\noriginal address of p_actions->action : %p",&p_actions->action[0]);
 
-
-        //int nbOfTasks = countNbTask(strConf);
-        //int nbOfActions = countNbAction(strConf);
-        //task * task = malloc(sizeof(task) * nbOfTasks);
-        //action * action = malloc(sizeof(action) * nbOfActions);
-
-
-
-
-        //freeStrConf(strConf);
-
-
-
-
+        readConfigurationFile(configurationFile, p_tasks, p_actions);
         fclose(configurationFile);
+        /* work here */
+        for( int i = 0; i < actions.nbActions; i++) {
+            printf("actions %d : "
+                   "\n\tname : %s "
+                   "\n\turl :  %s "
+                   "\n\tmax-depth : %d"
+                   "\n\tversioning : %d"
+                   "\n\ttypes : %s",i,actions.action[i].name, actions.action[i].url, actions.action[i].max_depth, actions.action[i].versioning, actions.action[i].type[0]);
+        }
         return 0;
     }
 

@@ -1,142 +1,149 @@
 #include "include/main.h"
-int * getLongestLineAndNumberLines()
-{
-    char * configFilePath = malloc(sizeof(char) * 180);
-    getConfigFilePath(configFilePath);
-    FILE * file = fopen(configFilePath,"r");
-    int c;
-    int nbChar = 0;
-    int nbLine = 1;
-    int longestLine = 0;
-    int currentLine = 0;
-    while((c = getc(file)) != EOF) {
-        if(c == '\n') {
-            if(currentLine > longestLine) longestLine = currentLine;
-            currentLine = 0;
-            nbLine++;
-        }
-        nbChar++;
-        currentLine++;
-    }
-    int * result = malloc(sizeof(int) * 2);
-    result[0] = longestLine;
-    result[1] = nbLine;
-    fclose(file);
-    free(configFilePath);
-    return result;
-}
-char ** confToStr(FILE * file)
-{
-    int * lines = getLongestLineAndNumberLines(); /* lines[0] longest line : lines[1] number of lines */
-    char ** strOfConf = malloc(sizeof(char **) * lines[1]);
-    int longestLine = lines[0], nbLines = lines[1];
-    if(strOfConf == NULL) return (char **) EXIT_FAILURE;
-    int i = 0;
-    for(; i<nbLines ; i++) {
-        strOfConf[i] = calloc(longestLine,sizeof(char) * longestLine);
-        if(strOfConf[i] == NULL) return (char **) EXIT_FAILURE;
-    }
-
-    char * l = malloc(longestLine);
-    fgets(l,longestLine,file);
-    strcpy(strOfConf[0],l);
-    strcat(*strOfConf,"\0");
-    for( i = 1; i < nbLines; i++) {
-        fgets(l,longestLine,file);
-        strcat(strOfConf[i], l);
-        strcat(strOfConf[i], "\0");
-    }
-    return strOfConf;
-}
-/*
-char * removeComment(char * line)
-{
-    if(line == NULL) return NULL;
-    if(strlen(line) == 0) return NULL;
-    char * lineCorrected = calloc(strlen(line), sizeof(char) * strlen(line));
-    u_long i = 0;
-    for( ; i < strlen(line); i++) {
-        if(line[i] == '#') return lineCorrected;
-        else lineCorrected[i] = line[i];
-    }
-    return lineCorrected;
-}
-*/
-/*
-void removeAllComments(char ** str)
-{
-    int i = 0, j = 0;
-    int * lines = getLongestLineAndNumberLines();
-    char ** strWithoutComments = calloc(lines[1],sizeof(char **) * lines[1]);
-    int nbLines = lines[1];
-    for( ;  i < nbLines; i++) {
-        strWithoutComments[j] = calloc(lines[0], sizeof(char) * lines[0]);
-        if(removeComment(str[i]) != NULL) strcpy(strWithoutComments[j++],removeComment(str[i]));
-    }
-}
-*/
-int countNbTask(char ** conf)
-{
-    int * lines = getLongestLineAndNumberLines();
-    int nbLines = lines[1];
-    int i = 0, counter = 0;
-    for( ; i < nbLines; i++ ) {
-        if(strncmp(conf[i], "==", 2) == 0 && strlen(conf[i]) == 3) { /* si il y'a == dedans et que le string est "=\n" */
-            counter++;
-        }
-    }
-    return counter;
-}
-int countNbAction(char ** conf)
-{
-    int * lines = getLongestLineAndNumberLines();
-    int nbLines = lines[1];
-    int i = 0, counter = 0;
-    for ( ; i < nbLines; i++) {
-        if(strncmp(conf[i], "=", 1) == 0 && strlen(conf[i]) == 2) {
-            counter++;
-        }
-    }
-    return counter;
-}
 void removeComment(char * line)
 {
     char * commentPos;
     commentPos = strchr(line,'#');
-    int endOfLineComment = 0;
     if(commentPos) {
         long position =  commentPos - line;
-        if(position > 0) endOfLineComment = 1;
         memcpy(line,line, position);
-        if(endOfLineComment) line[position++] = '\n';
+        /* remove space at the end of the line */
+        int i = 1;
+        while(line[position - i] == ' ') line[position - i++] = '\0';
+        /* doesn't hurt */
         line[position] = '\0';
     }
 }
-void checkKeyAction(char * line, int actionN, int lineN, int new)
+void fillActionWithValue(char * key, char * value, struct_action * action)
 {
-    if(*line != '{') return;
-    printf("\n\n\nACTIONS%d : \nline : %s", actionN, line);
-    const char delim[4] = "{->}";
-    char * token = strtok(line,delim);
-    do {
-        printf("\ntoken : %s", token);
-        token = strtok(NULL, delim);
-    } while(token != NULL);
-
+    /* set default */
+    action->name = malloc(20);
+    strcpy(action->name,"no name");
+    action->name = malloc(20);
+    strcpy(action->url,"no url");
+    action->max_depth = 0;
+    action->versioning = 0;
+    action->type[0] = malloc(20);
+    strcpy(action->type[0], "no type");
+    if(strcmp(key,"max-depth") == 0) action->max_depth = isNumber(value);
 }
-void checkKeyTask(char * line, int taskN, int lineN, int new)
+void timeToSeconds(char * time, char * value, int long long * seconds)
 {
-    if(*line != '{') return;
-    printf("\n\n\nTASKS%d : \nline : %s", taskN, line);
-    const char delim[4] = "{->}";
-    char * token = strtok(line,delim);
-    do {
-        printf("\ntoken : %s", token);
-        token = strtok(NULL, delim);
-    } while(token != NULL);
-
+    if (strcmp(time,"second")  == 0) *seconds += isNumber(value);
+    if(strcmp(time,"seconds")  == 0) *seconds += isNumber(value);
+    if(strcmp(time,"minute")   == 0) *seconds += isNumber(value) * 60;
+    if(strcmp(time,"minutes")  == 0) *seconds += isNumber(value) * 60;
+    if(strcmp(time,"hour")     == 0) *seconds += (isNumber(value) * 60) * 60;
+    if(strcmp(time,"hours")    == 0) *seconds += (isNumber(value) * 60) * 60;
+    if(strcmp(time,"day")      == 0) *seconds += ((isNumber(value) * 60) * 60) * 24;
+    if(strcmp(time,"days")     == 0) *seconds += ((isNumber(value) * 60) * 60) * 24;
+    if(strcmp(time,"week")     == 0) *seconds += (((isNumber(value) * 60) * 60) * 24) * 7;
+    if(strcmp(time,"weeks")    == 0) *seconds += (((isNumber(value) * 60) * 60) * 24) * 7;
+    if(strcmp(time,"month")    == 0) *seconds += ((((isNumber(value) * 60) * 60) * 24) * 7 * 30);
+    if(strcmp(time,"months")   == 0) *seconds += ((((isNumber(value) * 60) * 60) * 24) * 7 * 30);
 }
-void checkMode(char * line, int * inAction, int * inTask, int * nbActions, int * nbTasks, int * next, int * new)
+void checkKey(char * line, int actionN, int action, struct_action * p_action, int taskN, int task, int ** nbActionsPerTasks,  int long long * seconds)
+{
+    if(*line != '{' && *line != '(') return;
+    if(action)
+        printf("\n\n\nACTIONS%d : \nline : %s", actionN, line);
+    if(task)
+        printf("\n\n\nTASKS%d : \nline : %s", taskN, line);
+    if(*line == '{') {
+        int mode;
+        if(action) mode = 1;
+        else if(task) mode = 2;
+        else return; /* no mode, wtf ?*/
+        char * key = calloc(256, sizeof(char));
+        char * value = calloc(256, sizeof(char));
+        const char delim[4] = "{->}";
+        char * token = strtok(line, delim);
+        while(token != NULL) {
+            /* special case for max-depth */
+            if(strcmp(token,"max") == 0) {
+                strcpy(key, token);
+                strcat(key,"-depth");
+            } else if(isKeyActionValid(token, mode)) strcpy(key, token);
+            else strcpy(value,token);
+            token = strtok(NULL, delim);
+        }
+        if( strlen(key) != 0 && key && value && strlen(value) != 0) {
+            printf("\nkey : %s", key);
+            printf("\nvalue : %s", value);
+            timeToSeconds(key, value, seconds);
+        } else printf("  ---> INVALID LINE\n");
+        //fillActionWithValue(key,value,p_action);
+    } else {
+        /* it's the line in a task that tells what are the actions */
+        int countActionPerTask = 0;
+        if(*line == '(' && task) {
+            printf("\n%s", line);
+            char * token = strtok(line, ",");
+            if(token) countActionPerTask++;
+            while((token = strtok(NULL,",")) != NULL)
+                countActionPerTask++;
+        }
+        if(task) {
+            nbActionsPerTasks = realloc(nbActionsPerTasks,sizeof(int*)*taskN);
+            nbActionsPerTasks[taskN-1] = malloc(sizeof(int));
+            nbActionsPerTasks[taskN-1][0] = countActionPerTask;
+        }
+    }
+}
+/*
+ * check is str is a number
+ * return the number if it is
+ * return -1 if it is not
+ */
+int long long isNumber(char * s)
+{
+    char * endptr;
+    errno = 0; // reset error number
+    int long long res = strtoll(s,&endptr,10);
+    /* number too small or too large */
+    if(errno == ERANGE)
+        return -1;
+    /* no character was read */
+    else if(endptr == s)
+        return -1;
+    /*
+     * if *endptr != '\0' it means it is not the end of the string
+     * we did not convert the all string
+    */
+    else if(*endptr)
+        return -1;
+    return res;
+}
+/*
+ * mode :
+ * action = 1
+ * task   = 2
+*/
+int isKeyActionValid(char * key, int mode)
+{
+    if (strcmp(key,"name") == 0) return 1;
+    if (mode == 1) {
+        if ((strcmp(key,"type")             == 0 )||
+                (strcmp(key,"versioning")   == 0) ||
+                (strcmp(key,"url")          == 0))
+            return 1;
+    } else if (mode == 2) {
+        if ((strcmp(key,"second")       == 0)   ||
+                (strcmp(key,"seconds")  == 0)   ||
+                (strcmp(key,"minute")   == 0)   ||
+                (strcmp(key,"minutes")  == 0)   ||
+                (strcmp(key,"hour")     == 0)   ||
+                (strcmp(key,"hours")    == 0)   ||
+                (strcmp(key,"day")      == 0)   ||
+                (strcmp(key,"days")     == 0)   ||
+                (strcmp(key,"week")     == 0)   ||
+                (strcmp(key,"weeks")    == 0)   ||
+                (strcmp(key,"month")    == 0)   ||
+                (strcmp(key,"months")   == 0))
+            return 1;
+    }
+    return 0;
+}
+void checkMode(const char * line, int * inAction, int * inTask, int * nbActions, int * nbTasks, int * next, int * new)
 {
     if(line[0] == '=' && line[1] == '=') {
         *inAction = 0;
@@ -153,13 +160,21 @@ void checkMode(char * line, int * inAction, int * inTask, int * nbActions, int *
         *new = 1;
     }
 }
-void checkFileForSyntaxError(FILE * config, task * tasks, action * actions)
+void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions * actions)
 {
     char line[300];
     char firstChar[5] = "=({+";
     int countLine = 1;
     int inTask = 0, nbTasks = 0;
     int inAction = 0, nbActions = 0;
+    int ** nbActionsPerTasks;
+    actions = malloc(sizeof(struct_actions));
+    actions->action = malloc(sizeof(struct_action));
+    int long long seconds = 0;
+    int long long * pseconds = &seconds;
+    int long long * secondsPerTasks = calloc(1,sizeof(int long long));
+    nbActionsPerTasks = malloc(sizeof(int *));
+    *nbActionsPerTasks = malloc(sizeof(int));
     while(fgets(line, 300, config)) {
         line[(strchr(line,'\n') - line)] = '\0';
         removeComment(line); /* work correctly */
@@ -167,25 +182,33 @@ void checkFileForSyntaxError(FILE * config, task * tasks, action * actions)
             fprintf(stderr,"\n%c syntax error at %d:1",*line,countLine);
             return;
         }
-        int next = 0, new = 1; /* new est là pour savoir quand on passe sur une nouvelle action */
-        checkMode(line, &inAction, &inTask, &nbActions, &nbTasks, &next, &new);
+        int nextAction = 0, newAction = 1; /* check if we are in a new action */
+        int currentNbTask = nbTasks; /* check if we are in a new tasks */
+        int currentNbAction = nbActions;
+        checkMode(line, &inAction, &inTask, &nbActions, &nbTasks, &nextAction, &newAction);
         if(inTask) {
-            checkKeyTask(line, nbTasks, countLine, new);
+            printf("\nsending &actions->action[%d], memory address : %p", nbActions-1, &actions->action[0]);
+            checkKey(line, 0, 0, &actions->action[nbActions-1],nbTasks, 1, nbActionsPerTasks, pseconds);
         }
         if(inAction) {
-            checkKeyAction(line, nbActions, countLine, new);
+            printf("\nsending &actions->action[%d], memory address : %p", nbActions-1, &actions->action[0]);
+            checkKey(line, nbActions, 1,&actions->action[nbActions-1], 0, 0, 0, 0);
+        }
+        if(nbTasks || currentNbTask != nbTasks) {
+            secondsPerTasks = realloc(secondsPerTasks,nbTasks);
+            secondsPerTasks[nbTasks-1] += seconds;
+            seconds = 0;
+        }
+        if(currentNbAction != nbActions) {
+            actions->action = realloc(actions->action,sizeof(struct_action)*nbActions);
         }
         countLine = countLine + 1;
     }
-}
-
-
-
-void freeStrConf(char ** str)
-{
-    int * lines = getLongestLineAndNumberLines();
-    int nbLines = lines[1];
-    int i = 0;
-    for (; i < nbLines; i++ ) free(str[i]);
-    free(str);
+    tasks->nbTasks = nbTasks;
+    tasks->task = malloc(sizeof(struct_task) * nbTasks);
+    for(int i = 0; i < nbTasks; i++) {
+        tasks->task[i].actions = malloc(sizeof(struct_action) * *nbActionsPerTasks[i]);
+        tasks->task[i].nbActions = *nbActionsPerTasks[i];
+        tasks->task[i].second = secondsPerTasks[i];
+    }
 }

@@ -3,12 +3,8 @@
 
 #include "main.h"
 
-char ** confToStr(FILE *);
-void freeStrConf(char **);
-void removeAllComments(char **);
-int countNbTask(char ** conf);
-int countNbAction(char ** conf);
-void readConfigurationFile(FILE *);
-void checkFileForSyntaxError(FILE * f, task *, action *);
 
+void readConfigurationFile(FILE *, struct_tasks *, struct_actions *);
+int isKeyActionValid(char *, int);
+int long long isNumber(char * s);
 #endif //CURLI_PARSER_H
