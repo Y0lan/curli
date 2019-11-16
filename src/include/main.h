@@ -15,4 +15,6 @@
 #define CONFIGURATION_FILE "/.config/curli/conf.sconf"
 #define OK == 0 /* function is true */
 #define NOTOK !=  0  /* function is false */
+#define TASK 2
+#define ACTION 1
 

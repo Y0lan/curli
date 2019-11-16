@@ -10,22 +10,23 @@ typedef struct struct_action {
     unsigned int max_depth;
     unsigned short versioning;
     char ** type;
+    unsigned int numberOfTypes;
 } struct_action;
 
 typedef struct struct_actions {
     struct_action * action;
-    int nbActions;
+    int numberOfActions; // OK
 } struct_actions;
 
 typedef struct struct_task {
     struct_action * actions;
-    unsigned long long  second; /* Let's say that we will count the time before each action in second */
-    unsigned int nbActions;
+    unsigned long long  second; // OK
+    unsigned int numberOfActions; // OK
 } struct_task;
 
 typedef struct struct_tasks {
-    struct_task * task;
-    unsigned int nbTasks;
+    struct_task * task; // OK
+    unsigned int numberOfTasks; // OK
 } struct_tasks;
 
 #endif //CURLI_STRUCT_H
