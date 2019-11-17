@@ -12,12 +12,10 @@ int main(int argc, char ** argv)
     while (1) {
         configurationFile = openConfigurationFile(configFilePath); /* open with r+ */
         if (configurationFile == NULL) return 1; /* There have been a problem opening the file */
-        struct_tasks tasks;
-        struct_tasks *p_tasks = &tasks;
-        struct_actions actions;
-        struct_actions *p_actions = &actions;
-        p_actions->action = malloc(sizeof(struct_action));
-        readConfigurationFile(configurationFile, p_tasks, p_actions);
+        struct_tasks tasks = {0};
+        struct_actions actions = {0};
+        actions.action = malloc(sizeof(struct_action));
+        readConfigurationFile(configurationFile, &tasks, &actions);
         fclose(configurationFile);
         /* work here */
         printf("total number of actions : %d", actions.numberOfActions);
@@ -28,11 +26,15 @@ int main(int argc, char ** argv)
         }
         for (i = 0; i < actions.numberOfActions; i++) {
             printf("\naction number %d : ", i + 1);
-            //printf("\nname : %s", actions.action[i].name);
-            //printf("\nurl : %s",actions.action[i].url);
+            printf("\nname : %s", actions.action[i].name);
+            printf("\nurl : %s",actions.action[i].url);
             printf("\ndepth : %d",actions.action[i].max_depth);
-            //printf("\nversioning : %d",actions.action[i].versioning);
-            //printf("\ntype: %s",actions.action[i].type[0]);
+            printf("\nversioning : %d",actions.action[i].versioning);
+            printf("\nnumber of types: %d", actions.action[i].numberOfTypes);
+            for(u_int j = 0; j < actions.action[i].numberOfTypes; j++) {
+                printf("\ntypes : %s", actions.action[i].type[j]);
+            }
+            NULL;
         }
         return 0;
     }

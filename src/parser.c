@@ -5,21 +5,54 @@ void removeComment(char * line)
     commentPos = strchr(line,'#');
     if(commentPos) {
         long position =  commentPos - line;
-        memcpy(line,line, position);
+        line[position] = '\0';
         /* remove space at the end of the line */
         int i = 1;
         while(line[position - i] == ' ') line[position - i++] = '\0';
         /* doesn't hurt */
-        line[position] = '\0';
     }
 }
-struct_action * fillActionWithValue(char * key, char * value)
+void fillActionWithValue(struct_action * action, char * key, char * value)
 {
-    struct_action * action = malloc(sizeof(struct_action));
-    if(action == NULL) return action;
-    if(strcmp(key,"max-depth") == 0) action->max_depth = isNumber(value);
-    return action;
+
+    if(strcmp(key,"name") == 0) {
+        action->name = malloc(strlen(value));
+        strcpy(action->name,value);
+    } else if(strcmp(key,"url") == 0) {
+        action->url = malloc(strlen(value));
+        strcpy(action->url, value);
+    } else if(strcmp(key,"versioning") == 0) {
+        if(strcmp(value,"off") == 0) action->versioning = 0;
+        if(strcmp(value,"on") == 0) action->versioning = 1;
+    } else if(strcmp(key,"max") == 0) action->max_depth = isNumber(value);
+    else if(strcmp(key,"type") == 0) {
+        char *trash = malloc(strlen(value));
+        memcpy(trash, value, strlen(value));
+        int numberOfTypes = countElementBetweenParenthesis(trash);
+        action->numberOfTypes = numberOfTypes;
+        action->type = malloc(sizeof(char *));
+        char *token = strtok(value, "(,)");
+        int c = 0;
+        while (token != NULL) {
+            if(action->type[c] != NULL) free(action->type[c]);
+            action->type[c] = malloc(strlen(token));
+            strcpy(action->type[c], token);
+            c = c + 1;
+            token = strtok(NULL, "(,)");
+        }
+    }
 }
+
+void fillDefaultValue(struct_action * action)
+{
+    action->numberOfTypes = 1;
+    action->type = malloc(sizeof(char *));
+    action->type[0] = malloc(4);
+    strcpy(action->type[0], "all");
+    action->versioning = 0;
+    action->max_depth = 0;
+}
+
 void timeToSeconds(char * time, char * value, int long long * seconds)
 {
     if(strcmp(time,"second")   == 0) *seconds += isNumber(value);
@@ -42,19 +75,18 @@ void getKeyandKeyValue(char * key, char * value, char * line, int mode)
     while(token != NULL) {
         if(isKeyActionValid(token,mode)) {
             strcpy(key, token);
-            if(strcmp(key,"max") == 0) strcat(key,"-depth");
         } else strcpy(value,token);
         token = strtok(NULL, delim);
     }
 }
-int countActionsInTask(char * line)
+int countElementBetweenParenthesis(char * line)
 {
     int counter = 0;
     if(strtok(line, ",") != NULL) counter++;
     while(strtok(NULL,",") != NULL) counter++;
     return counter;
 }
-void fillStructure(char * line, int mode, int taskN,  int * nbActionsPerTasks,  int long long * seconds, struct_action * action, int nbActions)
+void fillStructure(char * line, int mode, int taskN, int * nbActionsPerTasks, int long long * seconds, struct_action * action, int nbActions, char *** nameTask)
 {
     /* check if it is a valid key / value type of line */
     if(*line != '{' && *line != '(') return;
@@ -62,11 +94,30 @@ void fillStructure(char * line, int mode, int taskN,  int * nbActionsPerTasks,  
         char * key = calloc(256, sizeof(char));
         char * value = calloc(256, sizeof(char));
         getKeyandKeyValue(key,value,line,mode);
-        if(action) action[nbActions - 1] =  fillActionWithValue(key,value)[0];
+        if(action)
+            fillActionWithValue(&action[nbActions-1],key, value);
         timeToSeconds(key, value, seconds);
     }
-    if(*line == '(' && mode == TASK) /* we are on the line containing the action of the tasks */
-        nbActionsPerTasks[taskN-1] += countActionsInTask(line);
+    if(*line == '(' && mode == TASK) { /* we are on the line containing the action of the tasks */
+        char * trash = malloc(strlen(line));
+        memcpy(trash,line,strlen(line));
+        nbActionsPerTasks[taskN-1] += countElementBetweenParenthesis(trash);
+        free(trash);
+        if(nameTask != NULL) {
+            nameTask = malloc(sizeof(char *) * nbActionsPerTasks[taskN - 1]);
+            char * name = strtok(line,"(,)");
+            uint c = 0;
+            while(name != NULL) {
+                nameTask[taskN-1] = malloc(sizeof(char *) * nbActionsPerTasks[taskN-1]);
+                nameTask[taskN-1][c] = malloc(strlen(name));
+                strcpy(nameTask[taskN-1][c], name);
+                printf("\n%s", nameTask[taskN-1][c]);
+                name = strtok(NULL,"(,)");
+                printf("\nname : %s", nameTask[taskN - 1][c]);
+                c = c + 1;
+            }
+        }
+    }
 }
 /*
  * check is str is a number
@@ -103,7 +154,8 @@ int isKeyActionValid(char * key, int mode)
     if (mode == ACTION) {
         if ((strcmp(key,"type")             == 0 )||
                 (strcmp(key,"versioning")   == 0) ||
-                (strcmp(key,"url")          == 0))
+                (strcmp(key,"url")          == 0) ||
+                (strcmp(key,"max")          == 0))
             return 1;
     } else if (mode == TASK) {
         if ((strcmp(key,"second")       == 0)   ||
@@ -145,7 +197,8 @@ int checkSyntaxErrorOnFirstCharacterOfLine(char c, char * line, int lineNumber)
 }
 void removeNewLineEOL(char * line)
 {
-    line[(strchr(line, '\n') - line)] = '\0';
+    char * newLinePos = strchr(line,'\n');
+    if(newLinePos) line[(newLinePos - line)] = '\0';
 }
 
 void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions * actions)
@@ -157,6 +210,7 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
     int long long seconds = 0;
     int long long *pseconds = &seconds;
     int long long *secondsPerTasks = calloc(1, sizeof(int long long));
+    char *** actionsPerTasks = malloc(sizeof(char **));
     nbActionsPerTasks = malloc(sizeof(int));
     int mode = 0;
     while (fgets(line, 300, config)) {
@@ -166,19 +220,23 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
         int currentNbTask = nbTasks;
         int currentNbAction = nbActions;
         mode = checkMode(line, &nbActions, &nbTasks, mode);
+        if(currentNbAction != nbActions) {
+            fillDefaultValue(&actions->action[nbActions - 1]);
+            actions->action = realloc(actions->action,sizeof(struct_action) * nbActions);
+        }
+        if(currentNbTask != nbTasks) {
+            actionsPerTasks = realloc(actionsPerTasks, sizeof(char **) * nbTasks);
+        }
         if ( mode == TASK ) {
-            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds, NULL, nbActions);
+            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds, NULL, nbActions, actionsPerTasks);
         }
         if ( mode == ACTION ) {
-            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds,actions->action, nbActions);
+            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds, actions->action, nbActions, NULL);
         }
-        if (nbTasks || currentNbTask != nbTasks) {
+        if (nbTasks  || currentNbTask != nbTasks) {
             secondsPerTasks = realloc(secondsPerTasks, nbTasks);
             secondsPerTasks[nbTasks - 1] += seconds;
             seconds = 0;
-        }
-        if(nbActions || currentNbAction != nbActions) {
-            actions->action = realloc(actions->action, sizeof(struct_action *) * nbActions);
         }
         countLine = countLine + 1;
     }
@@ -189,5 +247,9 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
         tasks->task[i].actions = malloc(sizeof(struct_action *) * nbActionsPerTasks[i]);
         tasks->task[i].numberOfActions = nbActionsPerTasks[i];
         tasks->task[i].second = secondsPerTasks[i];
+        for(int j = 0; j < tasks[i].numberOfTasks; j++) {
+            //if(actionsPerTasks[i][j] == NULL) printf("is null");
+            //printf("\ntask[%d] have : %s", i+1, actionsPerTasks[i][j]);
+        }
     }
 }
