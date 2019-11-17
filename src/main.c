@@ -16,6 +16,7 @@ int main(int argc, char ** argv)
         struct_tasks *p_tasks = &tasks;
         struct_actions actions;
         struct_actions *p_actions = &actions;
+        p_actions->action = malloc(sizeof(struct_action));
         readConfigurationFile(configurationFile, p_tasks, p_actions);
         fclose(configurationFile);
         /* work here */
@@ -25,16 +26,14 @@ int main(int argc, char ** argv)
             printf("\nseconds of tasks %d : %lld", i+1, tasks.task[i].second);
             printf("\nnumber of actions for tasks %d : %d", i+1, tasks.task[i].numberOfActions);
         }
-        /*
         for (i = 0; i < actions.numberOfActions; i++) {
-            printf("action number %d : ", i);
-            printf("\nname : %s", actions.action[i].name);
-            printf("\nurl : %s",actions.action[i].url);
+            printf("\naction number %d : ", i + 1);
+            //printf("\nname : %s", actions.action[i].name);
+            //printf("\nurl : %s",actions.action[i].url);
             printf("\ndepth : %d",actions.action[i].max_depth);
-            printf("\nversioning : %d,",actions.action[i].versioning);
-            printf("\ntype: %s",actions.action[i].type[0]);
+            //printf("\nversioning : %d",actions.action[i].versioning);
+            //printf("\ntype: %s",actions.action[i].type[0]);
         }
-         */
         return 0;
     }
 }

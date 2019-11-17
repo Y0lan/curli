@@ -13,22 +13,12 @@ void removeComment(char * line)
         line[position] = '\0';
     }
 }
-void fillActionWithValue(char * key, char * value, struct_action * action)
+struct_action * fillActionWithValue(char * key, char * value)
 {
-    if(action != NULL) {
-        action = malloc(sizeof(struct_action));
-        /*
-        action->name = malloc(200);
-        strcpy(action->name,"no name");
-        action->url = malloc(200);
-        strcpy(action->url,"no url");
-        action->type[0] = malloc(200);
-        strcpy(action->type[0], "no type");
-        action->max_depth = 0;
-        action->versioning = 0;
-        */
-        if(strcmp(key,"max-depth") == 0) action->max_depth = isNumber(value);
-    }
+    struct_action * action = malloc(sizeof(struct_action));
+    if(action == NULL) return action;
+    if(strcmp(key,"max-depth") == 0) action->max_depth = isNumber(value);
+    return action;
 }
 void timeToSeconds(char * time, char * value, int long long * seconds)
 {
@@ -64,7 +54,7 @@ int countActionsInTask(char * line)
     while(strtok(NULL,",") != NULL) counter++;
     return counter;
 }
-void fillStructure(char * line, int mode, int taskN,  int * nbActionsPerTasks,  int long long * seconds, struct_action ** action)
+void fillStructure(char * line, int mode, int taskN,  int * nbActionsPerTasks,  int long long * seconds, struct_action * action, int nbActions)
 {
     /* check if it is a valid key / value type of line */
     if(*line != '{' && *line != '(') return;
@@ -72,7 +62,7 @@ void fillStructure(char * line, int mode, int taskN,  int * nbActionsPerTasks,  
         char * key = calloc(256, sizeof(char));
         char * value = calloc(256, sizeof(char));
         getKeyandKeyValue(key,value,line,mode);
-        //fillActionWithValue(key, value,*action);
+        if(action) action[nbActions - 1] =  fillActionWithValue(key,value)[0];
         timeToSeconds(key, value, seconds);
     }
     if(*line == '(' && mode == TASK) /* we are on the line containing the action of the tasks */
@@ -177,10 +167,10 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
         int currentNbAction = nbActions;
         mode = checkMode(line, &nbActions, &nbTasks, mode);
         if ( mode == TASK ) {
-            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds, NULL);
+            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds, NULL, nbActions);
         }
         if ( mode == ACTION ) {
-            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds,NULL);
+            fillStructure(line, mode, currentNbTask,nbActionsPerTasks, pseconds,actions->action, nbActions);
         }
         if (nbTasks || currentNbTask != nbTasks) {
             secondsPerTasks = realloc(secondsPerTasks, nbTasks);
@@ -188,16 +178,11 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
             seconds = 0;
         }
         if(nbActions || currentNbAction != nbActions) {
-            NULL;
+            actions->action = realloc(actions->action, sizeof(struct_action *) * nbActions);
         }
         countLine = countLine + 1;
     }
     actions->numberOfActions = nbActions;
-    actions->action = malloc(sizeof(struct_action));
-    for(int i = 0; i < nbActions; i++) {
-        actions->action = realloc(actions->action, sizeof(struct_action) * i);
-        actions->action->name = malloc(200);
-    }
     tasks->numberOfTasks = nbTasks;
     tasks->task = malloc(sizeof(struct_task *) * nbTasks);
     for (int i = 0; i < nbTasks; i++) {
