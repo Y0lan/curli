@@ -5,10 +5,11 @@
 #ifndef CURLI_SCHEDULER_H
 #define CURLI_SCHEDULER_H
 
-#include <pthread.h>
 #include "main.h"
+/*
 pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+ */
 
 void * threadTask( void * args);
 void * threadClock( void * args);
