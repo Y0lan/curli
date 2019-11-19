@@ -34,7 +34,7 @@ int main(int argc, char ** argv)
     /* THREADS */
 
 //    int ret;
-    u_int i;
+    u_int i, j, z;
 
     /* create thread for the clock */
     /*
@@ -48,7 +48,17 @@ int main(int argc, char ** argv)
     for (i = 0; i < tasks.numberOfTasks; i++) {
         printf("\nseconds of tasks %d : %lld", i+1, tasks.task[i].second);
         printf("\nnumber of actions for tasks %d : %d", i+1, tasks.task[i].numberOfActions);
-        printf("\n\n");
+        for( j = 0 ; j < tasks.task[i].numberOfActions; j++) {
+            printf("\ntask : %d have action: \n",i,j);
+            printf("\nname: %s", tasks.task[i].actions[j].name);
+            printf("\nurl: %s",tasks.task[i].actions[j].url);
+            printf("\nversioning : %d", tasks.task[i].actions[j].versioning);
+            printf("\nmax-depth : %d", tasks.task[i].actions[j].max_depth);
+            for( z = 0; z < tasks.task[i].actions[j].numberOfTypes; z++) {
+                printf("\ntype: %s",tasks.task[i].actions[j].type[z]);
+            }
+
+        }
     }
     /*
     for (i = 0; i < actions.numberOfActions; i++) {

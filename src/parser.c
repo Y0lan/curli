@@ -203,19 +203,11 @@ void removeNewLineEOL(char * line)
 struct_action getAction(struct_actions * actions, char * name)
 {
     uint i = 0;
-    struct_action * wrong = malloc(sizeof(struct_action));
-    wrong->name = malloc(strlen(WRONGACTION));
-    strcpy(wrong->name,WRONGACTION);
-    printf("\nname :%s", name);
     for( ; i < actions->numberOfActions; i++) {
-        printf("strcmpt(%s, %s) == %d", name, actions->action[i].name, strcmp(name, actions->action[i].name));
         if(strcmp(name, actions->action[i].name) == 0) {
-            free(wrong->name);
-            free(wrong);
             return actions->action[i];
         }
     }
-    return *wrong;
 }
 
 void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions * actions)
@@ -267,9 +259,8 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
         tasks->task[i].numberOfActions = nbActionsPerTasks[i];
         tasks->task[i].second = secondsPerTasks[i];
         tasks->task[i].actions = malloc(sizeof(struct_action) * tasks->task[i].numberOfActions);
-        for(int j = 0; j < tasks->task[i].numberOfActions; j++) {
+        for(uint j = 0; j < tasks->task[i].numberOfActions; j++) {
             tasks->task[i].actions[j] = getAction(actions,actionsPerTasks[i][j]);
-            printf("\ntasks->task[%d].actions[%d] = %s",i,j,tasks->task[i].actions[j].name);
         }
     }
 
