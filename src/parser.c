@@ -208,6 +208,8 @@ struct_action getAction(struct_actions * actions, char * name)
             return actions->action[i];
         }
     }
+    struct_action * wrong = NULL;
+    return *wrong;
 }
 
 void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions * actions)

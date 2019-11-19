@@ -28,20 +28,17 @@ int main(int argc, char ** argv)
     /* work here */
     //printf("total number of actions : %d", actions.numberOfActions);
 
-
-
-
     /* THREADS */
 
+    u_int i, j, z;
     int ret;
-    pthread_t threadClock;
-
-    ret = pthread_create(&threadClock, NULL, threadClockFunc,&tasks);
-    if(ret == 0) pthread_join(threadClock,NULL);
+    for(i = 0; i < tasks.numberOfTasks; i++) {
+        pthread_t threadTask;
+        ret = pthread_create(&threadTask, NULL, threadTaskFunc,&tasks.task[i]);
+        if(ret == 0) pthread_join(threadTask,NULL);
+    }
 
     /* DEBUGGING */
-    u_int i, j, z;
-
     /*
     for (i = 0; i < tasks.numberOfTasks; i++) {
         printf("\nseconds of tasks %d : %lld", i+1, tasks.task[i].second);

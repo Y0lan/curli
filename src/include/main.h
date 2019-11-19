@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <pthread.h>
+#include <curl/curl.h>
 #include "scheduler.h"
 #include "helper.h"
 #include "init.h"

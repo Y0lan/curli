@@ -32,3 +32,23 @@ void debug(char * message)
 {
     fprintf(stderr,"\n%s",message);
 }
+void showTasks(struct_tasks * tasks)
+{
+    uint i, j, z;
+    for (i = 0; i < tasks->numberOfTasks; i++) {
+        printf("\n <<< TASK >>>\n\n");
+        printf("\nseconds of tasks->%d : %lld", i+1, tasks->task[i].second);
+        printf("\nnumber of actions for tasks->%d : %d", i+1, tasks->task[i].numberOfActions);
+        for( j = 0 ; j < tasks->task[i].numberOfActions; j++) {
+            printf("\ntask : %d have action: \n",i+1,j);
+            printf("\nname: %s", tasks->task[i].actions[j].name);
+            printf("\nurl: %s",tasks->task[i].actions[j].url);
+            printf("\nversioning : %d", tasks->task[i].actions[j].versioning);
+            printf("\nmax-depth : %d", tasks->task[i].actions[j].max_depth);
+            for( z = 0; z < tasks->task[i].actions[j].numberOfTypes; z++) {
+                printf("\ntype: %s",tasks->task[i].actions[j].type[z]);
+            }
+        }
+    }
+
+}

@@ -35,7 +35,8 @@ void writeTemplateConfiguration(FILE * configuration)
     "\n+"
     "(First website, Second website)";
     if(configuration) {
-        fputs(template, configuration);
+        if(getc(configuration) == EOF)
+            fputs(template, configuration);
     }
 }
 void showMan()
@@ -123,7 +124,7 @@ void showMan()
 }
 int checkConfigurationExists(char * configFile, char * configFilePath)
 {
-
+    DIR * dir = opendir(CONFIG_PATH);
     if(ENOENT == errno) {
         debug("Not able to open configuration directory");
         return -1;
@@ -165,7 +166,7 @@ int createConfigurationFile(char * configPath, char * configFilePath)
     } else return -1; /* mkdir failed for other reason */
 
     /* put file configuration in directory */
-    FILE * file = fopen(configFilePath, "w"); /* write : create the file if it does not exist */
+    FILE * file = fopen(configFilePath, "a+"); /* write : create the file if it does not exist */
     printf("\nconfig created...");
     if(file == NULL) { /* there have been an error while opening the file */
         debug("A problem happened while opening the configuration file");
