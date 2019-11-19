@@ -11,9 +11,8 @@ pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  */
 
-void * threadTask( void * args);
-void * threadClock( void * args);
-void * threadUpdateScheduler( void * args);
+void * threadClockFunc( void * args);
+void * threadTaskFunc( void * args);
 
 
 #endif //CURLI_SCHEDULER_H

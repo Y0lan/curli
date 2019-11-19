@@ -33,18 +33,16 @@ int main(int argc, char ** argv)
 
     /* THREADS */
 
-//    int ret;
-    u_int i, j, z;
-
-    /* create thread for the clock */
-    /*
+    int ret;
     pthread_t threadClock;
-    ret = pthread_create(&threadClock,NULL, threadClock,&tasks);
-    if(!ret) pthread_join(threadClock,NULL);
-     */
 
+    ret = pthread_create(&threadClock, NULL, threadClockFunc,&tasks);
+    if(ret == 0) pthread_join(threadClock,NULL);
 
     /* DEBUGGING */
+    u_int i, j, z;
+
+    /*
     for (i = 0; i < tasks.numberOfTasks; i++) {
         printf("\nseconds of tasks %d : %lld", i+1, tasks.task[i].second);
         printf("\nnumber of actions for tasks %d : %d", i+1, tasks.task[i].numberOfActions);
@@ -58,11 +56,6 @@ int main(int argc, char ** argv)
                 printf("\ntype: %s",tasks.task[i].actions[j].type[z]);
             }
 
-        }
-    }
-    /*
-    for (i = 0; i < actions.numberOfActions; i++) {
-        printf("\naction number %d : ", i + 1);
         }
     }
      */
