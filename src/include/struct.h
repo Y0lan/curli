@@ -25,7 +25,7 @@ typedef struct struct_task {
 } struct_task;
 
 typedef struct struct_tasks {
-    struct_task * task; // OK
+    struct_task * task;
     unsigned int numberOfTasks; // OK
 } struct_tasks;
 

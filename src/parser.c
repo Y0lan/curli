@@ -14,7 +14,6 @@ void removeComment(char * line)
 }
 void fillActionWithValue(struct_action * action, char * key, char * value)
 {
-
     if(strcmp(key,"name") == 0) {
         action->name = malloc(strlen(value));
         strcpy(action->name,value);
@@ -94,9 +93,12 @@ void fillStructure(char * line, int mode, int taskN, int * nbActionsPerTasks, in
         char * key = calloc(256, sizeof(char));
         char * value = calloc(256, sizeof(char));
         getKeyandKeyValue(key,value,line,mode);
-        if(action)
+        if(action) {
             fillActionWithValue(&action[nbActions-1],key, value);
+        }
         timeToSeconds(key, value, seconds);
+        free(key);
+        free(value);
     }
     if(*line == '(' && mode == TASK) { /* we are on the line containing the action of the tasks */
         char * trash = malloc(strlen(line));
@@ -104,16 +106,13 @@ void fillStructure(char * line, int mode, int taskN, int * nbActionsPerTasks, in
         nbActionsPerTasks[taskN-1] += countElementBetweenParenthesis(trash);
         free(trash);
         if(nameTask != NULL) {
-            nameTask = malloc(sizeof(char *) * nbActionsPerTasks[taskN - 1]);
             char * name = strtok(line,"(,)");
             uint c = 0;
+            nameTask[taskN-1] = malloc(sizeof(char **) * nbActionsPerTasks[taskN-1]);
             while(name != NULL) {
-                nameTask[taskN-1] = malloc(sizeof(char *) * nbActionsPerTasks[taskN-1]);
                 nameTask[taskN-1][c] = malloc(strlen(name));
                 strcpy(nameTask[taskN-1][c], name);
-                printf("\n%s", nameTask[taskN-1][c]);
                 name = strtok(NULL,"(,)");
-                printf("\nname : %s", nameTask[taskN - 1][c]);
                 c = c + 1;
             }
         }
@@ -201,6 +200,24 @@ void removeNewLineEOL(char * line)
     if(newLinePos) line[(newLinePos - line)] = '\0';
 }
 
+struct_action getAction(struct_actions * actions, char * name)
+{
+    uint i = 0;
+    struct_action * wrong = malloc(sizeof(struct_action));
+    wrong->name = malloc(strlen(WRONGACTION));
+    strcpy(wrong->name,WRONGACTION);
+    printf("\nname :%s", name);
+    for( ; i < actions->numberOfActions; i++) {
+        printf("strcmpt(%s, %s) == %d", name, actions->action[i].name, strcmp(name, actions->action[i].name));
+        if(strcmp(name, actions->action[i].name) == 0) {
+            free(wrong->name);
+            free(wrong);
+            return actions->action[i];
+        }
+    }
+    return *wrong;
+}
+
 void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions * actions)
 {
     char * line = malloc(300); // buffer for each line read, assume the longest line is 300
@@ -210,7 +227,7 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
     int long long seconds = 0;
     int long long *pseconds = &seconds;
     int long long *secondsPerTasks = calloc(1, sizeof(int long long));
-    char *** actionsPerTasks = malloc(sizeof(char **));
+    char *** actionsPerTasks =  malloc(sizeof(char **));
     nbActionsPerTasks = malloc(sizeof(int));
     int mode = 0;
     while (fgets(line, 300, config)) {
@@ -221,8 +238,8 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
         int currentNbAction = nbActions;
         mode = checkMode(line, &nbActions, &nbTasks, mode);
         if(currentNbAction != nbActions) {
-            fillDefaultValue(&actions->action[nbActions - 1]);
             actions->action = realloc(actions->action,sizeof(struct_action) * nbActions);
+            fillDefaultValue(&actions->action[nbActions - 1]);
         }
         if(currentNbTask != nbTasks) {
             actionsPerTasks = realloc(actionsPerTasks, sizeof(char **) * nbTasks);
@@ -240,16 +257,30 @@ void readConfigurationFile(FILE * config, struct_tasks * tasks, struct_actions *
         }
         countLine = countLine + 1;
     }
+    free(line);
     actions->numberOfActions = nbActions;
     tasks->numberOfTasks = nbTasks;
-    tasks->task = malloc(sizeof(struct_task *) * nbTasks);
+
+
+    tasks->task = malloc(sizeof(struct_task *) * nbTasks + 1);
     for (int i = 0; i < nbTasks; i++) {
-        tasks->task[i].actions = malloc(sizeof(struct_action *) * nbActionsPerTasks[i]);
         tasks->task[i].numberOfActions = nbActionsPerTasks[i];
         tasks->task[i].second = secondsPerTasks[i];
-        for(int j = 0; j < tasks[i].numberOfTasks; j++) {
-            //if(actionsPerTasks[i][j] == NULL) printf("is null");
-            //printf("\ntask[%d] have : %s", i+1, actionsPerTasks[i][j]);
+        tasks->task[i].actions = malloc(sizeof(struct_action) * tasks->task[i].numberOfActions);
+        for(int j = 0; j < tasks->task[i].numberOfActions; j++) {
+            tasks->task[i].actions[j] = getAction(actions,actionsPerTasks[i][j]);
+            printf("\ntasks->task[%d].actions[%d] = %s",i,j,tasks->task[i].actions[j].name);
         }
     }
+
+    /* FREE STUFF */
+    free(secondsPerTasks);
+    for (uint i = 0; i < nbTasks; i++) {
+        for (uint j = 0; j < tasks->task[i].numberOfActions; j++) {
+            if(actionsPerTasks[i][j] != NULL) free(actionsPerTasks[i][j]);
+        }
+        free(actionsPerTasks[i]);
+    }
+    free(actionsPerTasks);
+
 }

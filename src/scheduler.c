@@ -16,10 +16,10 @@ void * threadClock( void * args)
 {
     struct_tasks * tasks = args;
 
-        for (int i = 0; i < tasks->numberOfTasks; i++) {
-            printf("\nseconds of tasks %d : %lld", i+1, tasks->task[i].second);
-            printf("\nnumber of actions for tasks %d : %d", i+1, tasks->task[i].numberOfActions);
-        }
+    for (int i = 0; i < tasks->numberOfTasks; i++) {
+        printf("\nseconds of tasks %d : %lld", i+1, tasks->task[i].second);
+        printf("\nnumber of actions for tasks %d : %d", i+1, tasks->task[i].numberOfActions);
+    }
     pthread_exit(NULL);
 }
 
