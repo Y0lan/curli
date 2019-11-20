@@ -124,7 +124,7 @@ void showMan()
 }
 int checkConfigurationExists(char * configFile, char * configFilePath)
 {
-    DIR * dir = opendir(CONFIG_PATH);
+    DIR * dir = opendir(configFile);
     if(ENOENT == errno) {
         debug("Not able to open configuration directory");
         return -1;

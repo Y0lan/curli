@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
     //printf("total number of actions : %d", actions.numberOfActions);
 
     /* THREADS */
-
+    showTasks(&tasks);
     u_int i, j, z;
     int ret;
     for(i = 0; i < tasks.numberOfTasks; i++) {
